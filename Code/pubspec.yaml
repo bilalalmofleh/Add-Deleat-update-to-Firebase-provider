@@ -40,6 +40,7 @@ dependencies:
   path_provider:
   cached_network_image:
   sliding_up_panel:
+  getwidget:
 
 dev_dependencies:
   flutter_test:

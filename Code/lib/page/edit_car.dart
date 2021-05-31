@@ -35,7 +35,7 @@ class _EditCarState extends State<EditCar> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blueAccent,
-          title: Text("View Note"),
+          title: Text("Edit Car"),
           actions: [
             Center(
               child: InkWell(

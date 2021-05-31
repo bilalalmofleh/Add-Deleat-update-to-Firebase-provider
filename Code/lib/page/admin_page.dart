@@ -25,12 +25,10 @@ class _AdminPageState extends State<AdminPage> {
     final userDocId = user.email;
     var _carID = DateTime.now().microsecondsSinceEpoch;
 
-
     final userRef = FirebaseFirestore.instance.collection('users');
     AdminModel adminModel = new AdminModel(
       userId: userDocId!,
       name: user.displayName!,
-
     );
     Map<String, dynamic> itemData = adminModel.toJson();
     userRef.doc(userDocId).set(itemData);
@@ -46,10 +44,11 @@ class _AdminPageState extends State<AdminPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => UserPage(
-                          userid: userDocId.toString(),
-                        )),
+                              userid: userDocId.toString(),
+                            )),
                   );
-                }, icon: Icon(FontAwesomeIcons.exchangeAlt)),
+                },
+                icon: Icon(FontAwesomeIcons.exchangeAlt)),
             IconButton(
                 onPressed: () {
                   final provider =
@@ -112,90 +111,96 @@ class _AdminPageState extends State<AdminPage> {
                     ],
                   );
                 default:
-                  return GridView.count(
-                    crossAxisCount: 1,
-                    children: snapshot.data!.docs.map((document) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Card(
-                          color: Colors.white,
-                          shadowColor: Colors.blueGrey,
-                          elevation: 5,
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GridView.count(
+                      crossAxisCount: 1,
+                      children: snapshot.data!.docs.map((document) {
+                        return Card(
                           child: Column(
                             children: [
                               CachedNetworkImage(
                                 placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                                imageUrl: document['carImg'],fit: BoxFit.cover,
+                                    const CircularProgressIndicator(),
+                                imageUrl: document['carImg'],
+                                fit: BoxFit.cover,
                                 width: MediaQuery.of(context).size.width,
                                 height: 240,
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Text(document['carName']),
-                                        ],
+                              Expanded(
+                                flex: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          document['carName'],
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                              color: Colors.grey.shade600),
+                                        ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                              "Price: \$${document['carPrice']}"),
-                                        ],
+                                      Container(
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => EditCar(
+                                                        userid: userDocId
+                                                            .toString(),
+                                                        carID: document["carId"]
+                                                            .toString(),
+                                                      )),
+                                            );
+                                          },
+                                          icon: Icon(Icons.settings),
+                                        ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Text("Colors:"),
-                                          Text(document['carColor'][0]),
-                                          Text(","),
-                                          Text(document['carColor'][1]),
-                                          Text(","),
-                                          Text(document['carColor'][2]),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                      const EdgeInsets.only(left: 8,right: 8),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-
-                                          Container(
-                                            height: 33,
-                                            child: ElevatedButton(
-                                              child: Text("Edit"),
-                                              onPressed: (){Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => EditCar(
-                                                      userid: userDocId.toString(),
-                                                      carID: document["carId"].toString(),
-                                                    )),
-                                              );},
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              )
+                              ),
+                              Divider(
+                                color: Colors.blue,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 8, right: 8),
+                                  child: Row(
+                                    children: [
+                                      Text("Price: \$${document['carPrice']}"),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 8, right: 8),
+                                  child: Row(
+                                    children: [
+                                      Text("Colors:"),
+                                      Text(document['carColor'][0]),
+                                      Text(","),
+                                      Text(document['carColor'][1]),
+                                      Text(","),
+                                      Text(document['carColor'][2]),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                    ),
                   );
               }
             }));

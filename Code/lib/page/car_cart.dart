@@ -12,7 +12,6 @@ class CarCart extends StatefulWidget {
 }
 
 class _CarCartState extends State<CarCart> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,215 +52,231 @@ class _CarCartState extends State<CarCart> {
                     ],
                   );
                 default:
-                  return GridView.count(
-                    crossAxisCount: 1,
-                    children: snapshot.data!.docs.map((document) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
-                        child: Card(
-                          child: Column(
-                            children: [
-                              CachedNetworkImage(
-                              placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        imageUrl: document['carImg'],fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width,
-                        height: 240,
-                      ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.height / 1.15,
+                          child: GridView.count(
+                            crossAxisCount: 1,
+                            children: snapshot.data!.docs.map((document) {
+                              return Card(
                                 child: Column(
                                   children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 2, 8, 0),
-                                      child: Row(
-                                        children: [
-                                          Text(document['carName']),
-                                        ],
+                                    CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      imageUrl: document['carImg'],
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 240,
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                document['carName'],
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color:
+                                                        Colors.grey.shade600),
+                                              ),
+                                            ),
+                                            Container(
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  AlertDialog alert = AlertDialog(
+                                                    title: Text('Delete ??'),
+                                                    content: SingleChildScrollView(
+                                                        child: ListBody(
+                                                            children: <Widget>[
+                                                              Text(
+                                                                  'Are you sure you want to delete this Car?'),
+                                                            ])),
+                                                    actions: [
+                                                      TextButton(
+                                                        child: Text('No'),
+                                                        onPressed: () {
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                      ),
+                                                      TextButton(
+                                                        child: Text(
+                                                          'Yes',
+                                                          style: TextStyle(
+                                                              color: Colors.grey),
+                                                        ),
+                                                        onPressed: () {
+                                                          FirebaseFirestore.instance
+                                                              .collection('users')
+                                                              .doc(widget.userid)
+                                                              .collection(
+                                                              "carWishList")
+                                                              .doc(document['carId'])
+                                                              .delete();
+
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return alert;
+                                                    },
+                                                  );
+
+                                                },
+                                                icon: Icon(Icons.delete),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                      child: Row(
-                                        children: [
-                                          Text("number of units:"),
-                                          IconButton(
-                                              onPressed: () {
-                                                int num;
-                                                if(document[
-                                                'numOfCarUserBuy']>1){
-
-                                                   num = document[
-                                                  'numOfCarUserBuy'] -
-                                                      1;
-                                                }else
-                                                  {
-                                                    num=1;
+                                    Divider(
+                                      color: Colors.blue,
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, right: 8),
+                                        child: Row(
+                                          children: [
+                                            Text("Number of Units : "),
+                                            IconButton(
+                                                onPressed: () {
+                                                  int num;
+                                                  if (document[
+                                                          'numOfCarUserBuy'] >
+                                                      1) {
+                                                    num = document[
+                                                            'numOfCarUserBuy'] -
+                                                        1;
+                                                  } else {
+                                                    num = 1;
                                                   }
-                                                final carRef = FirebaseFirestore
-                                                    .instance
-                                                    .collection('users')
-                                                    .doc(widget.userid)
-                                                    .collection("carWishList")
-                                                    .doc(document['carId']);
+                                                  final carRef =
+                                                      FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .doc(widget.userid)
+                                                          .collection(
+                                                              "carWishList")
+                                                          .doc(document[
+                                                              'carId']);
 
-                                                WishListModle wishListModel =
-                                                    new WishListModle(
-                                                        carName:
-                                                            document['carName'],
-                                                        carColor: [
-                                                          document['carColor']
-                                                              [0],
-                                                          document['carColor']
-                                                              [1],
-                                                          document['carColor']
-                                                              [2]
-                                                        ],
-                                                        carId:
-                                                            document['carId'],
-                                                        carImg:
-                                                            document['carImg'],
-                                                        carPrice: document[
-                                                            'carPrice'],
-                                                        numOfCarUserBuy: num,
-                                                        userId: widget.userid
-                                                            .toString());
-                                                Map<String, dynamic> carData =
-                                                    wishListModel.toJson();
-                                                carRef.set(carData);
-                                              },
-                                              icon: Icon(Icons
-                                                  .keyboard_arrow_down_rounded)),
-                                          Text(
-                                            document['numOfCarUserBuy']
-                                                .toString(),
-                                          ),
-                                          IconButton(
-                                              onPressed: () {
-                                                int num = document[
-                                                        'numOfCarUserBuy'] +
-                                                    1;
-                                                final carRef = FirebaseFirestore
-                                                    .instance
-                                                    .collection('users')
-                                                    .doc(widget.userid)
-                                                    .collection("carWishList")
-                                                    .doc(document['carId']);
+                                                  WishListModle wishListModel =
+                                                      new WishListModle(
+                                                          carName: document[
+                                                              'carName'],
+                                                          carColor: [
+                                                            document['carColor']
+                                                                [0],
+                                                            document['carColor']
+                                                                [1],
+                                                            document['carColor']
+                                                                [2]
+                                                          ],
+                                                          carId:
+                                                              document['carId'],
+                                                          carImg: document[
+                                                              'carImg'],
+                                                          carPrice: document[
+                                                              'carPrice'],
+                                                          numOfCarUserBuy: num,
+                                                          userId: widget.userid
+                                                              .toString());
+                                                  Map<String, dynamic> carData =
+                                                      wishListModel.toJson();
+                                                  carRef.set(carData);
+                                                },
+                                                icon: Icon(Icons
+                                                    .keyboard_arrow_down_rounded)),
+                                            Text(
+                                              document['numOfCarUserBuy']
+                                                  .toString(),
+                                            ),
+                                            IconButton(
+                                                onPressed: () {
+                                                  int num = document[
+                                                          'numOfCarUserBuy'] +
+                                                      1;
+                                                  final carRef =
+                                                      FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .doc(widget.userid)
+                                                          .collection(
+                                                              "carWishList")
+                                                          .doc(document[
+                                                              'carId']);
 
-                                                WishListModle wishListModel =
-                                                    new WishListModle(
-                                                        carName:
-                                                            document['carName'],
-                                                        carColor: [
-                                                          document['carColor']
-                                                              [0],
-                                                          document['carColor']
-                                                              [1],
-                                                          document['carColor']
-                                                              [2]
-                                                        ],
-                                                        carId:
-                                                            document['carId'],
-                                                        carImg:
-                                                            document['carImg'],
-                                                        carPrice: document[
-                                                            'carPrice'],
-                                                        numOfCarUserBuy: num,
-                                                        userId: widget.userid
-                                                            .toString());
-                                                Map<String, dynamic> carData =
-                                                    wishListModel.toJson();
-                                                carRef.set(carData);
-                                              },
-                                              icon: Icon(Icons
-                                                  .keyboard_arrow_up_rounded)),
-                                        ],
+                                                  WishListModle wishListModel =
+                                                      new WishListModle(
+                                                          carName: document[
+                                                              'carName'],
+                                                          carColor: [
+                                                            document['carColor']
+                                                                [0],
+                                                            document['carColor']
+                                                                [1],
+                                                            document['carColor']
+                                                                [2]
+                                                          ],
+                                                          carId:
+                                                              document['carId'],
+                                                          carImg: document[
+                                                              'carImg'],
+                                                          carPrice: document[
+                                                              'carPrice'],
+                                                          numOfCarUserBuy: num,
+                                                          userId: widget.userid
+                                                              .toString());
+                                                  Map<String, dynamic> carData =
+                                                      wishListModel.toJson();
+                                                  carRef.set(carData);
+                                                },
+                                                icon: Icon(Icons
+                                                    .keyboard_arrow_up_rounded)),
+                                            Text(
+                                                "Price: \$${int.parse(document['carPrice']) * document['numOfCarUserBuy']}"),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 0, 8, 2),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                              "Price: \$${int.parse(document['carPrice']) * document['numOfCarUserBuy']}"),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 2, 8, 2),
-                                      child: Row(
-                                        children: [
-                                          Text("Colors:"),
-                                          Text(document['carColor'][0]),
-                                          Text(","),
-                                          Text(document['carColor'][1]),
-                                          Text(","),
-                                          Text(document['carColor'][2]),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                      const EdgeInsets.only(left: 8,right: 8),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          ElevatedButton(onPressed: (){
-                                            AlertDialog alert = AlertDialog(
-                                              title: Text('Delete ??'),
-                                              content: SingleChildScrollView(
-                                                  child: ListBody(children: <Widget>[
-                                                    Text('Are you sure you want to delete this Car?'),
-                                                  ])),
-                                              actions: [
-                                                TextButton(
-                                                  child: Text('No'),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                                TextButton(
-                                                  child: Text(
-                                                    'Yes',
-                                                    style: TextStyle(color: Colors.grey),
-                                                  ),
-                                                  onPressed: () {
-                                                    FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(widget.userid)
-                                                        .collection("carWishList")
-                                                        .doc(document['carId'])
-                                                        .delete();
-
-                                                    Navigator.of(context).pop();
-
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return alert;
-                                              },
-                                            );
-
-                                          }, child: Text("Delete"))
-                                        ],
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8, right: 8),
+                                        child: Row(
+                                          children: [
+                                            Text("Colors:"),
+                                            Text(document['carColor'][0]),
+                                            Text(","),
+                                            Text(document['carColor'][1]),
+                                            Text(","),
+                                            Text(document['carColor'][2]),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              )
-                            ],
+                              );
+                            }).toList(),
                           ),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    ),
                   );
               }
             }));

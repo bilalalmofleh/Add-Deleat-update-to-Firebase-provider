@@ -121,7 +121,7 @@ class _UserPageState extends State<UserPage> {
                           )),
                 );
               },
-              icon: Icon(FontAwesomeIcons.cartPlus)),
+              icon: Icon(FontAwesomeIcons.boxOpen)),
           IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -130,7 +130,7 @@ class _UserPageState extends State<UserPage> {
         ],
       ),
       body: SlidingUpPanel(
-        maxHeight: MediaQuery.of(context).size.height/4,
+        maxHeight: MediaQuery.of(context).size.height / 4,
         minHeight: 70,
         margin: EdgeInsets.only(left: 7, right: 7),
         borderRadius: BorderRadius.only(
@@ -241,129 +241,144 @@ class _UserPageState extends State<UserPage> {
                     ],
                   );
                 default:
-                  return Column(
-                    children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height,
-                        child: GridView.count(
-                          crossAxisCount: 1,
-                          children: snapshot.data!.docs.map((document) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                color: Colors.white,
-                                shadowColor: Colors.blueGrey,
-                                elevation: 5,
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.height/1.20,
+                          child: GridView.count(
+                            crossAxisCount: 1,
+                            children: snapshot.data!.docs.map((document) {
+                              return Card(
                                 child: Column(
                                   children: [
                                     CachedNetworkImage(
                                       placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
+                                      const CircularProgressIndicator(),
                                       imageUrl: document['carImg'],
                                       fit: BoxFit.cover,
-                                      width:
-                                          MediaQuery.of(context).size.width,
+                                      width: MediaQuery.of(context).size.width,
                                       height: 240,
                                     ),
-                                    Container(
-                                      width:
-                                          MediaQuery.of(context).size.width,
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Text(document['carName']),
-                                              ],
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                document['carName'],
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.grey.shade600),
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                    "Price: \$${document['carPrice']}"),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Text("Colors:"),
-                                                Text(document['carColor'][0]),
-                                                Text(","),
-                                                Text(document['carColor'][1]),
-                                                Text(","),
-                                                Text(document['carColor'][2]),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 8,right: 8),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
+                                            Container(
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  final carWish =
+                                                  FirebaseFirestore
+                                                      .instance
+                                                      .collection('users')
+                                                      .doc(widget.userid)
+                                                      .collection(
+                                                      "carWishList")
+                                                      .doc(document[
+                                                  'carId']);
+                                                  WishListModle
+                                                  wishListModle =
+                                                  new WishListModle(
+                                                      carName: document[
+                                                      'carName'],
+                                                      userId: widget
+                                                          .userid
+                                                          .toString(),
+                                                      carColor: [
+                                                        document[
+                                                        'carColor'][0],
+                                                        document[
+                                                        'carColor'][1],
+                                                        document[
+                                                        'carColor'][2]
+                                                      ],
+                                                      carId: document[
+                                                      'carId'],
+                                                      carImg: document[
+                                                      'carImg'],
+                                                      carPrice: document[
+                                                      'carPrice'],
+                                                      numOfCarUserBuy: 1);
+                                                  Map<String, dynamic>
+                                                  carData =
+                                                  wishListModle.toJson();
+                                                  carWish.set(carData);
 
-                                                Container(
-                                                  height: 33,
-                                                  child: ElevatedButton(
-                                                    child: Text("Add To Cart"),
-                                                    onPressed: (){
-                                                      final carWish = FirebaseFirestore.instance
-                                                          .collection('users')
-                                                          .doc(widget.userid)
-                                                          .collection("carWishList")
-                                                          .doc(document['carId']);
-                                                      WishListModle wishListModle =
-                                                      new WishListModle(
-                                                          carName: document['carName'],
-                                                          userId: widget.userid.toString(),
-                                                          carColor: [
-                                                            document['carColor'][0],
-                                                            document['carColor'][1],
-                                                            document['carColor'][2]
-                                                          ],
-                                                          carId: document['carId'],
-                                                          carImg: document['carImg'],
-                                                          carPrice: document['carPrice'],
-                                                          numOfCarUserBuy: 1);
-                                                      Map<String, dynamic> carData =
-                                                      wishListModle.toJson();
-                                                      carWish.set(carData);
+                                                  ScaffoldMessenger.of(
+                                                      context)
+                                                      .showSnackBar(SnackBar(
+                                                      content: Text(
+                                                          'Car added to Cart')));
 
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(
-                                                              content: Text('Car added to Cart')));
-                                                    },
-                                                  ),
-                                                )
-                                              ],
+                                                },
+                                                icon: Icon(Icons
+                                                    .add_shopping_cart_outlined),
+
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    )
+                                    ),
+                                    Divider(
+                                      color: Colors.blue,
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 8, right: 8),
+                                        child: Row(
+                                          children: [
+                                            Text("Price: \$${document['carPrice']}"),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                        const EdgeInsets.only(left: 8, right: 8),
+                                        child: Row(
+                                          children: [
+                                            Text("Colors:"),
+                                            Text(document['carColor'][0]),
+                                            Text(","),
+                                            Text(document['carColor'][1]),
+                                            Text(","),
+                                            Text(document['carColor'][2]),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
               }
             }),
       ),
     );
   }
-
 
   Widget FChip(String filterText, var selection) {
     return FilterChip(
